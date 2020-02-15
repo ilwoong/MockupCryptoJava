@@ -22,9 +22,18 @@
  * THE SOFTWARE.
  */
 
-module mockup.crypto {
-	exports mockup.crypto;
-	exports mockup.crypto.block_cipher;
-	exports mockup.crypto.rsa;
-	exports mockup.crypto.util;
+package mockup.crypto;
+
+public abstract class BlockCipher implements NamedAlgorithm {
+
+	public abstract int getBlocksize();
+
+	public abstract int getKeysize();
+
+	public abstract void init(byte[] mk);
+
+	public abstract void encryptBlock(final byte[] src, int srcOff, byte[] dst, int dstOff);
+
+	public abstract void decryptBlock(final byte[] src, int srcOff, byte[] dst, int dstOff);
+
 }

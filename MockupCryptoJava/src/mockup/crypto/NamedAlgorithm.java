@@ -22,9 +22,8 @@
  * THE SOFTWARE.
  */
 
-module mockup.crypto {
-	exports mockup.crypto;
-	exports mockup.crypto.block_cipher;
-	exports mockup.crypto.rsa;
-	exports mockup.crypto.util;
+package mockup.crypto;
+
+public interface NamedAlgorithm {
+	String getName();
 }

@@ -22,9 +22,17 @@
  * THE SOFTWARE.
  */
 
-module mockup.crypto {
-	exports mockup.crypto;
-	exports mockup.crypto.block_cipher;
-	exports mockup.crypto.rsa;
-	exports mockup.crypto.util;
+
+package mockup.crypto.util;
+
+public class Rotations {
+
+	public static final int rotl32(int value, int rot) {
+		return (value << rot) | (value >>> (32 - rot));
+	}
+
+	public static final int rotr32(int value, int rot) {
+		return (value >>> rot) | (value << (32 - rot));
+	}
+
 }

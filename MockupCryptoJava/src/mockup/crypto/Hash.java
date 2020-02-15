@@ -26,9 +26,7 @@ package mockup.crypto;
 
 import mockup.crypto.hash.Sha256;
 
-public abstract class Hash {
-
-	public abstract String getName();
+public abstract class Hash implements NamedAlgorithm {
 	
 	public abstract int getBlockSize();
 

@@ -76,6 +76,24 @@ public class ByteArray {
 		return result;
 	}
 
+	public static void xor(byte[] dst, final byte[] lhs, final byte[] rhs) {
+		if (dst == null || lhs == null || rhs == null) {
+			throw new IllegalArgumentException("At least one of the input arrays is null");
+		}
+
+		if (lhs.length < dst.length || rhs.length < dst.length) {
+			throw new IllegalArgumentException("wrong array length");
+		}
+
+		xor(dst, lhs, rhs, dst.length);
+	}
+
+	public static void xor(byte[] dst, final byte[] lhs, final byte[] rhs, int count) {
+		for (var i = 0; i < count; ++i) {
+			dst[i] = (byte) (lhs[i] ^ rhs[i]);
+		}
+	}
+
 	public static String toString(byte[] bs) {
 		if (bs == null) {
 			return null;
