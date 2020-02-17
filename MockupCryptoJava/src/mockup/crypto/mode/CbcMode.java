@@ -22,45 +22,51 @@
  * THE SOFTWARE.
  */
 
-package mockup.crypto.rsa;
+package mockup.crypto.mode;
 
-import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 
-import mockup.crypto.Hash;
+import mockup.crypto.BufferedBlockCipher;
 import mockup.crypto.util.ByteArray;
-import mockup.crypto.util.DataConversions;
 
-public class MaskGenerationFunction {
+public class CbcMode extends BufferedBlockCipher {
 
-	private Hash _hash;
+	private byte[] initialIv;
+	private byte[] workingIv;
+	private byte[] xorbuffer;
 
-	public void init(String hashName) {
-		_hash = Hash.getInstance(hashName);
+	@Override
+	public String getName() {
+		return "CBC/" + cipher.getName();
 	}
 
-	public byte[] generate(byte[] mgfSeed, int maskLen) {
-		ByteArrayOutputStream mask = new ByteArrayOutputStream();
+	@Override
+	protected void restoreToInitialState() {
+		Arrays.fill(xorbuffer, (byte) 0);
+		System.arraycopy(initialIv, 0, workingIv, 0, blocksize);
+	}
 
-		int maxCounter = (int) Math.ceil((double)maskLen / _hash.getOutputLength());
-		
-		System.out.println("maxcounter = " + maxCounter);
+	@Override
+	protected void init(byte[] iv) {
+		xorbuffer = new byte[blocksize];
+		initialIv = new byte[blocksize];
+		workingIv = new byte[blocksize];
 
-		for (int counter = 0; counter < maxCounter; ++counter) {
-			byte[] d = DataConversions.i2bs(counter, 4);
+		System.arraycopy(iv, 0, initialIv, 0, blocksize);
+		System.arraycopy(iv, 0, workingIv, 0, blocksize);
+	}
 
-			_hash.reset();
-			_hash.update(mgfSeed);
-			byte[] digest = _hash.doFinal(d);
+	@Override
+	public void updateBlock(byte[] src, int srcpos, byte[] dst, int dstpos) {
+		if (cipherMode == CipherMode.ENCRYPT) {
+			ByteArray.xor(xorbuffer, 0, workingIv, 0, src, srcpos, blocksize);
+			cipher.encryptBlock(xorbuffer, 0, workingIv, 0);
+			System.arraycopy(workingIv, 0, dst, dstpos, blocksize);
 
-			mask.writeBytes(digest);
+		} else {
+			cipher.decryptBlock(src, srcpos, xorbuffer, 0);
+			ByteArray.xor(dst, dstpos, xorbuffer, 0, workingIv, 0, blocksize);
+			System.arraycopy(src, srcpos, workingIv, 0, blocksize);
 		}
-
-		return mask.toByteArray();
 	}
-
-	public byte[] applyMask(byte[] data, byte[] mgfSeed, int maskLen) {
-		byte[] mask = generate(mgfSeed, maskLen);
-		return ByteArray.getXoredBytes(data, mask);
-	}
-
 }

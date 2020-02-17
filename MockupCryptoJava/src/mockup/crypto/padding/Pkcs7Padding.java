@@ -22,11 +22,50 @@
  * THE SOFTWARE.
  */
 
-module mockup.crypto {
-	exports mockup.crypto;
-	exports mockup.crypto.block_cipher;
-	exports mockup.crypto.mode;
-	exports mockup.crypto.padding;
-	exports mockup.crypto.rsa;
-	exports mockup.crypto.util;
+package mockup.crypto.padding;
+
+import java.util.Arrays;
+
+import mockup.crypto.Padding;
+import mockup.crypto.util.ByteArray;
+
+public class Pkcs7Padding extends Padding {
+
+	public Pkcs7Padding(int blocksize) {
+		super(blocksize);
+	}
+
+	@Override
+	public String getName() {
+		return "PKCS7-Padding";
+	}
+
+	@Override
+	public byte[] pad(byte[] in, int length) {
+		var pad = blocksize - (length % blocksize);
+		var buffer = new byte[length + pad];
+
+		System.arraycopy(in, 0, buffer, 0, length);
+		Arrays.fill(buffer, length, buffer.length, (byte) pad);
+		
+		return buffer;
+	}
+
+	public byte[] unpad(byte[] in) {
+		var pad = in[in.length - 1];
+
+		if (pad < 0 || pad > blocksize) {
+			throw new InvalidPaddingException("Wrong padding size: " + pad);
+		}
+
+		for (int i = in.length - 1; i >= in.length - pad; --i) {
+			if (in[i] != pad) {
+				throw new InvalidPaddingException("Wrong padding value");
+			}
+		}
+
+		var buffer = new byte[in.length - pad];
+		System.arraycopy(in, 0, buffer, 0, in.length - pad);
+		return buffer;
+	}
 }

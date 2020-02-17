@@ -22,11 +22,34 @@
  * THE SOFTWARE.
  */
 
-module mockup.crypto {
-	exports mockup.crypto;
-	exports mockup.crypto.block_cipher;
-	exports mockup.crypto.mode;
-	exports mockup.crypto.padding;
-	exports mockup.crypto.rsa;
-	exports mockup.crypto.util;
+package mockup.crypto.mode;
+
+import mockup.crypto.BufferedBlockCipher;
+
+public class EcbMode extends BufferedBlockCipher {
+
+	@Override
+	public String getName() {
+		return "ECB/" + cipher.getName();
+	}
+
+	@Override
+	protected void restoreToInitialState() {
+		// nothing to do
+	}
+
+	@Override
+	protected void init(byte[] iv) {
+		// nothing to do
+	}
+
+	@Override
+	public void updateBlock(byte[] src, int srcpos, byte[] dst, int dstpos) {
+		if (cipherMode == CipherMode.ENCRYPT) {
+			cipher.encryptBlock(src, srcpos, dst, dstpos);
+
+		} else {
+			cipher.decryptBlock(src, srcpos, dst, dstpos);
+		}
+	}
 }

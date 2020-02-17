@@ -22,11 +22,14 @@
  * THE SOFTWARE.
  */
 
-module mockup.crypto {
-	exports mockup.crypto;
-	exports mockup.crypto.block_cipher;
-	exports mockup.crypto.mode;
-	exports mockup.crypto.padding;
-	exports mockup.crypto.rsa;
-	exports mockup.crypto.util;
+package mockup.crypto.padding;
+
+public class InvalidPaddingException extends RuntimeException {
+
+	private static final long serialVersionUID = 1L;
+
+	public InvalidPaddingException(String msg) {
+		super(msg);
+	}
+
 }

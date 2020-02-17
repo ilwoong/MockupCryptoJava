@@ -53,44 +53,42 @@ public class ByteArray {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
 		for (byte[] arg : args) {
-			baos.writeBytes(arg);
+			if (arg != null) {
+				baos.writeBytes(arg);
+			}
 		}
 
 		return baos.toByteArray();
 	}
 
-	public static byte[] xor(byte[] lhs, byte[] rhs) {
-		return xor(lhs, rhs, lhs.length);
-	}
-
-	public static byte[] xor(byte[] lhs, byte[] rhs, int count) {
-		if (lhs.length < count || rhs.length < count) {
-			throw new IllegalArgumentException("array length mismatch");
+	public static byte[] getXoredBytes(byte[] lhs, byte[] rhs) {
+		if (lhs == null || rhs == null) {
+			throw new IllegalArgumentException("null array is not allowed");
 		}
 
-		byte[] result = new byte[count];
-		for (int i = 0; i < count; ++i) {
-			result[i] = (byte) (lhs[i] ^ rhs[i]);
-		}
-
-		return result;
+		return getXoredBytes(lhs, rhs, lhs.length);
 	}
 
-	public static void xor(byte[] dst, final byte[] lhs, final byte[] rhs) {
+	public static byte[] getXoredBytes(byte[] lhs, byte[] rhs, int count) {
+		byte[] dst = new byte[count];
+		xor(dst, 0, lhs, 0, rhs, 0, count);
+		return dst;
+	}
+
+	public static void xor(byte[] dst, int dstoff, final byte[] lhs, int lhsoff, final byte[] rhs, int rhsoff,
+			int count) {
+
 		if (dst == null || lhs == null || rhs == null) {
-			throw new IllegalArgumentException("At least one of the input arrays is null");
+			throw new IllegalArgumentException("null array is not allowed");
 		}
 
-		if (lhs.length < dst.length || rhs.length < dst.length) {
-			throw new IllegalArgumentException("wrong array length");
+		if ((dst.length < dstoff + count) || (lhs.length < lhsoff + count) || (rhs.length < rhsoff + count)) {
+			var msg = String.format("%d, %d, %d", dst.length, lhs.length, rhs.length);
+			throw new IllegalArgumentException("wrong array length: " + msg);
 		}
 
-		xor(dst, lhs, rhs, dst.length);
-	}
-
-	public static void xor(byte[] dst, final byte[] lhs, final byte[] rhs, int count) {
-		for (var i = 0; i < count; ++i) {
-			dst[i] = (byte) (lhs[i] ^ rhs[i]);
+		for (int i = 0; i < count; ++i) {
+			dst[dstoff + i] = (byte) (lhs[lhsoff + i] ^ rhs[rhsoff + i]);
 		}
 	}
 
@@ -101,8 +99,13 @@ public class ByteArray {
 
 		StringBuilder sb = new StringBuilder();
 
+		var count = 0;
 		for (byte d : bs) {
 			sb.append(String.format("%02x", d));
+			count += 1;
+			if ((count & 0x3) == 0) {
+				sb.append(" ");
+			}
 		}
 
 		return sb.toString();

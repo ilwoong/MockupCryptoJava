@@ -22,11 +22,22 @@
  * THE SOFTWARE.
  */
 
-module mockup.crypto {
-	exports mockup.crypto;
-	exports mockup.crypto.block_cipher;
-	exports mockup.crypto.mode;
-	exports mockup.crypto.padding;
-	exports mockup.crypto.rsa;
-	exports mockup.crypto.util;
+package mockup.crypto;
+
+public abstract class Padding implements NamedAlgorithm {
+
+	protected int blocksize;
+
+	public Padding(int blocksize) {
+		this.blocksize = blocksize;
+	}
+
+	public byte[] pad(byte[] in) {
+		return pad(in, in.length);
+	}
+	
+	public abstract byte[] pad(byte[] in, int length);
+
+	public abstract byte[] unpad(byte[] in);
+
 }

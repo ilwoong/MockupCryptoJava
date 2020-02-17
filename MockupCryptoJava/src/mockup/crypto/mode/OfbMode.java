@@ -22,11 +22,39 @@
  * THE SOFTWARE.
  */
 
-module mockup.crypto {
-	exports mockup.crypto;
-	exports mockup.crypto.block_cipher;
-	exports mockup.crypto.mode;
-	exports mockup.crypto.padding;
-	exports mockup.crypto.rsa;
-	exports mockup.crypto.util;
+package mockup.crypto.mode;
+
+import mockup.crypto.BufferedBlockCipher;
+import mockup.crypto.util.ByteArray;
+
+public class OfbMode extends BufferedBlockCipher {
+
+	private byte[] initialIv;
+	private byte[] workingIv;
+
+	@Override
+	public String getName() {
+		return "OFB/" + cipher.getName();
+	}
+
+	@Override
+	protected void restoreToInitialState() {
+		System.arraycopy(initialIv, 0, workingIv, 0, initialIv.length);
+	}
+
+	@Override
+	protected void init(byte[] iv) {
+
+		initialIv = new byte[blocksize];
+		workingIv = new byte[blocksize];
+
+		System.arraycopy(iv, 0, initialIv, 0, iv.length);
+		System.arraycopy(iv, 0, workingIv, 0, iv.length);
+	}
+
+	@Override
+	public void updateBlock(byte[] src, int srcpos, byte[] dst, int dstpos) {
+		cipher.encryptBlock(workingIv, 0, workingIv, 0);
+		ByteArray.xor(dst, dstpos, src, srcpos, workingIv, 0, shift);
+	}
 }
